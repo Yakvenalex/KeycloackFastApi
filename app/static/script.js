@@ -281,19 +281,8 @@ confirmDeleteBtn.addEventListener('click', handleConfirmDelete)
 // Добавляем обработчик для кнопки выхода
 document
   .querySelector('a[href="/api/logout"]')
-  .addEventListener('click', async (e) => {
+  .addEventListener('click', (e) => {
     e.preventDefault()
-    try {
-      showLoader()
-      const response = await fetch('/api/logout')
-      if (response.redirected) {
-        window.location.href = response.url
-      } else {
-        window.location.href = '/'
-      }
-    } catch (error) {
-      console.error('Ошибка при выходе:', error)
-      hideLoader()
-      alert('Произошла ошибка при выходе. Попробуйте еще раз.')
-    }
+    showLoader()
+    window.location.href = '/api/logout'
   })
