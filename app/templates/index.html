@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keycloak Demo</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+      <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
+        Добро пожаловать!
+      </h1>
+      <p class="text-gray-600 text-center mb-8">
+        Для доступа к защищенной странице необходимо авторизоваться
+      </p>
+      <div class="text-center">
+        <a
+          href="/login"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
+        >
+          Войти через Keycloak
+        </a>
+      </div>
+    </div>
+  </body>
+</html>
