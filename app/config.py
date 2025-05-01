@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     CLIENT_SECRET: str
     BASE_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
+    @property
+    def database_url(self) -> str:
+        return f"sqlite+aiosqlite:///{self.BASE_DIR}/data/db.sqlite3"
+
     # Вычисляемые URL
     @property
     def token_url(self) -> str:
@@ -32,7 +36,7 @@ class Settings(BaseSettings):
 
     @property
     def redirect_uri(self) -> str:
-        return f"{self.BASE_URL}/login/callback"
+        return f"{self.BASE_URL}/api/login/callback"
 
     model_config = SettingsConfigDict(env_file=f"{BASE_DIR}/.env")
 

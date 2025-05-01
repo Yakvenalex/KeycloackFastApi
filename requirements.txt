@@ -1,0 +1,9 @@
+fastapi==0.115.12
+uvicorn==0.34.2
+httpx==0.28.1
+loguru==0.7.3
+pydantic==2.11.4
+pydantic-settings==2.9.1
+alembic==1.13.3
+SQLAlchemy==2.0.35
+aiosqlite==0.20.0

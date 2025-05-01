@@ -1,30 +1,232 @@
-<!DOCTYPE html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Keycloak Demo</title>
+    <title>Mimo Заметки</title>
+    <!-- Bootstrap CSS -->
     <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
   </head>
-  <body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-      <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
-        Добро пожаловать!
-      </h1>
-      <p class="text-gray-600 text-center mb-8">
-        Для доступа к защищенной странице необходимо авторизоваться
-      </p>
-      <div class="text-center">
-        <a
-          href="/login"
-          class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
-        >
-          Войти через Keycloak
-        </a>
+  <body>
+    <header class="bg-dark text-white p-3 text-center mb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mb-0">Mimo Заметки</h1>
+        <a href="/api/logout" class="btn btn-outline-light">Выйти</a>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="note-input-container bg-light p-4 rounded shadow-sm mb-5">
+        <h2 class="mb-3 h4">Добавить новую заметку</h2>
+        <div class="mb-3">
+          <label for="note-title-input" class="form-label">Заголовок:</label>
+          <input
+            type="text"
+            id="note-title-input"
+            class="form-control form-control-sm"
+            placeholder="Введите заголовок..."
+          />
+        </div>
+        <div class="mb-3">
+          <label for="note-desc-input" class="form-label">Описание:</label>
+          <textarea
+            id="note-desc-input"
+            class="form-control form-control-sm"
+            rows="4"
+            placeholder="Введите описание заметки..."
+          ></textarea>
+        </div>
+        <button id="add-note-btn" class="btn btn-primary float-end">
+          Добавить заметку
+        </button>
+        <div style="clear: both"></div>
+        <!-- Clear float -->
+      </div>
+
+      <div
+        id="notes-list"
+        class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4"
+      >
+        <!-- Заметки будут добавлены сюда -->
+      </div>
+    </main>
+
+    <!-- View Note Modal -->
+    <div
+      class="modal fade"
+      id="viewNoteModal"
+      tabindex="-1"
+      aria-labelledby="viewNoteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="viewNoteModalLabel">
+              Просмотр заметки
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h6 id="viewNoteTitle" class="mb-3"></h6>
+            <p id="viewNoteDescription" style="white-space: pre-wrap"></p>
+            <small id="viewNoteDate" class="text-muted d-block mt-3"></small>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Закрыть
+            </button>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Edit Note Modal -->
+    <div
+      class="modal fade"
+      id="editNoteModal"
+      tabindex="-1"
+      aria-labelledby="editNoteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="editNoteModalLabel">
+              Редактировать заметку
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="edit-note-id" />
+            <div class="mb-3">
+              <label for="edit-note-title" class="form-label">Заголовок:</label>
+              <input
+                type="text"
+                class="form-control form-control-sm bg-dark text-light border-secondary"
+                id="edit-note-title"
+                placeholder="Введите заголовок..."
+              />
+            </div>
+            <div class="mb-3">
+              <label for="edit-note-description" class="form-label"
+                >Описание:</label
+              >
+              <textarea
+                class="form-control form-control-sm bg-dark text-light border-secondary"
+                id="edit-note-description"
+                rows="5"
+                placeholder="Введите описание заметки..."
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Отмена
+            </button>
+            <button type="button" class="btn btn-primary" id="save-edit-btn">
+              Сохранить изменения
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      class="modal fade"
+      id="deleteConfirmModal"
+      tabindex="-1"
+      aria-labelledby="deleteConfirmModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="deleteConfirmModalLabel">
+              Подтвердить удаление
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="delete-note-id" />
+            Вы уверены, что хотите удалить эту заметку? Это действие нельзя
+            будет отменить.
+          </div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Отмена
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="confirm-delete-btn"
+            >
+              Удалить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center mt-5 py-3 text-white">
+      <p>&copy; 2025 Mimo Заметки</p>
+    </footer>
+
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay d-none">
+      <div class="loader-spinner"></div>
+    </div>
+
+    <!-- Bootstrap JS Bundle (Popper included) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="/static/script.js"></script>
   </body>
 </html>
